@@ -2,187 +2,278 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Nezuko Enhance Pro 🌸</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>NEZUKO V3 ULTIMATE - RAINBOW EDITION</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cherry+Bomb+One&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
     <style>
-        :root { --pink: #ffb7c5; --dark: #1a1a1a; --green: #778b50; --kimono: #f3a6b5; }
-        body { 
-            background: var(--dark); color: white; font-family: 'Segoe UI', sans-serif;
-            display: flex; flex-direction: column; align-items: center; min-height: 100vh; margin: 0;
-            overflow-x: hidden;
+        :root { 
+            --accent: #ff85a2; 
+            --accent-glow: #ff2d75;
+            --bg: #0d0005; 
+            --glass: rgba(255, 255, 255, 0.1);
         }
         
-        .sakura { position: fixed; color: var(--pink); top: -10%; user-select: none; z-index: -1; animation: fall 10s linear infinite; }
-        @keyframes fall { to { transform: translateY(110vh) rotate(360deg); } }
+        body.theme-pink { --accent: #ff85a2; --accent-glow: #ff2d75; --bg: #0d0005; }
+        body.theme-blue { --accent: #2BD2FF; --accent-glow: #2ecc71; --bg: #00050d; }
+        body.theme-gold { --accent: #FFD700; --accent-glow: #FFA500; --bg: #0d0900; }
+        body.theme-purple { --accent: #bf55ff; --accent-glow: #8e44ad; --bg: #08000d; }
+        body.theme-red { --accent: #ff4b2b; --accent-glow: #ff416c; --bg: #0d0000; }
+        body.theme-green { --accent: #00ff88; --accent-glow: #00bd68; --bg: #000d05; }
 
-        .container { 
-            background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px);
-            border: 2px solid var(--pink); border-radius: 25px;
-            padding: 30px; width: 90%; max-width: 500px; margin: 80px 0 40px 0; text-align: center;
-            position: relative;
-        }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; transition: background 0.3s, border-color 0.3s, color 0.3s; }
+        body { background: var(--bg); color: #fff; font-family: 'Poppins', sans-serif; margin: 0; height: 100vh; overflow: hidden; }
 
-        .logo-wrapper {
-            width: 100px; height: 100px;
-            position: absolute; top: -50px; left: 50%; transform: translateX(-50%);
-            border-radius: 50%; border: 4px solid var(--pink);
-            overflow: hidden; box-shadow: 0 0 20px rgba(255, 183, 197, 0.6);
-            background: var(--dark);
-        }
-        .logo-wrapper img { width: 100%; height: 100%; object-fit: cover; }
+        .bg-layer { position: fixed; inset: 0; background: url('https://w0.peakpx.com/wallpaper/403/105/HD-wallpaper-nezuko-background-pink-aesthetic-thumbnail.jpg') center/cover; filter: blur(15px) brightness(0.25); z-index: -1; transform: scale(1.1); }
 
-        .preview-box { width: 100%; border-radius: 15px; overflow: hidden; margin: 15px 0; display: none; border: 2px solid var(--pink); }
-        img { width: 100%; display: block; }
+        #name-overlay { position: fixed; inset: 0; background: var(--bg); z-index: 2000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center; }
 
-        .mode-selector { display: flex; gap: 10px; margin-bottom: 20px; justify-content: center; }
-        .mode-btn { 
-            background: transparent; border: 1px solid var(--pink); color: white;
-            padding: 8px 15px; border-radius: 20px; cursor: pointer; font-size: 0.8rem;
-        }
-        .mode-btn.active { background: var(--pink); color: var(--dark); font-weight: bold; }
+        .logo-container { margin: 10px auto; width: 100px; height: 100px; border-radius: 50%; border: 3px solid var(--accent); padding: 5px; box-shadow: 0 0 20px var(--accent-glow); }
+        .logo-img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
 
-        #enhanceBtn {
-            background: linear-gradient(45deg, var(--pink), #ff8da1);
-            color: var(--dark); border: none; padding: 18px; width: 100%;
-            border-radius: 50px; font-weight: 900; cursor: pointer; letter-spacing: 1px;
-            box-shadow: 0 4px 15px rgba(255, 183, 197, 0.4);
-            transition: 0.3s;
-        }
-        #enhanceBtn:disabled { opacity: 0.8; cursor: not-allowed; filter: grayscale(0.5); }
+        #welcome-screen { position: fixed; inset: 0; background: var(--bg); z-index: 1000; display: none; align-items: center; justify-content: center; }
+        .welcome-anim { font-family: 'Cherry Bomb One'; font-size: 1.8rem; color: var(--accent); text-align: center; animation: mwah 3s ease-in-out forwards; }
+        @keyframes mwah { 0% { opacity:0; } 30% { opacity:1; } 100% { opacity:0; visibility: hidden; } }
 
-        .download-area { display: none; margin-top: 20px; padding: 15px; border-top: 1px solid #444; }
-        .dl-button { background: var(--green); color: white; padding: 12px; width: 100%; border-radius: 10px; border: none; cursor: pointer; font-weight: bold; }
+        .sidebar { position: fixed; top: 0; right: -100%; width: 300px; height: 100%; background: rgba(0,0,0,0.98); border-left: 3px solid var(--accent); transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 990; padding: 25px; overflow-y: auto; }
+        .sidebar.active { right: 0; }
+        .theme-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 20px 0; }
+        .theme-dot { height: 45px; border-radius: 12px; border: 2px solid rgba(255,255,255,0.2); cursor: pointer; }
 
-        .loader { display: none; border: 4px solid #333; border-top: 4px solid var(--pink); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 20px auto; }
-        @keyframes spin { 100% { transform: rotate(360deg); } }
+        .btn-pill { width: 100%; padding: 16px; margin: 10px 0; border-radius: 50px; border: none; font-weight: 700; cursor: pointer; color: #fff; text-transform: uppercase; font-size: 0.8rem; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+        .btn-sora { background: linear-gradient(45deg, #ff00cc, #3333ff); }
+        .btn-veo { background: linear-gradient(45deg, #00dbde, #fc00ff); }
+        .btn-flux { background: linear-gradient(45deg, #f093fb, #f5576c); }
+        .btn-chat { background: linear-gradient(45deg, #4facfe, #00f2fe); }
+        .btn-accent { background: var(--accent); color: #000; }
+        .btn-omega { background: #25D366; color: #fff; } 
+        .btn-back { background: #222; border: 1px solid var(--accent); }
+
+        header { height: 70px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; border-bottom: 2px solid var(--accent); background: rgba(0,0,0,0.7); backdrop-filter: blur(10px); }
+        .app-viewport { height: calc(100vh - 150px); overflow-y: auto; padding: 20px; }
+        .page { display: none; width: 100%; }
+        .page.active { display: block; animation: zoomIn 0.3s ease; }
+        @keyframes zoomIn { from { opacity:0; transform: scale(0.9); } to { opacity:1; transform: scale(1); } }
+        
+        .card { background: var(--glass); border-radius: 30px; padding: 25px; border: 1px solid rgba(255, 255, 255, 0.1); margin-bottom: 20px; backdrop-filter: blur(10px); }
+        .media-res { width: 100%; border-radius: 20px; margin-top: 20px; display: none; border: 3px solid var(--accent); }
+
+        footer { position: fixed; bottom: 85px; width: 100%; text-align: center; color: var(--accent); font-size: 10px; font-weight: 800; letter-spacing: 2px; }
+        nav.tab-bar { position: fixed; bottom: 0; width: 100%; height: 80px; background: rgba(0,0,0,0.95); border-top: 2px solid var(--accent); display: flex; align-items: center; z-index: 800; }
+        .tab-item { flex: 1; text-align: center; color: #fff; opacity: 0.4; font-size: 10px; }
+        .tab-item.active { opacity: 1; color: var(--accent); font-weight: bold; }
     </style>
 </head>
-<body>
-    <div id="sakura-container"></div>
-    
-    <div class="container">
-        <div class="logo-wrapper">
-            <img src="https://i.pinimg.com/736x/07/0d/95/070d957d383925c04826b647895311cc.jpg" alt="Nezuko Logo">
+<body class="theme-pink">
+
+<div class="bg-layer"></div>
+
+<div id="name-overlay">
+    <div class="logo-container">
+        <img src="https://files.catbox.moe/svnb6u.jpeg" class="logo-img" alt="Logo">
+    </div>
+    <h2 style="color:var(--accent); font-family:'Cherry Bomb One';">WHAT'S YOUR NAME?</h2>
+    <input type="text" id="user-name-input" class="btn-pill" style="text-align:center; background:rgba(255,255,255,0.1); width:80%; max-width:300px; color:#fff;" placeholder="Enter name...">
+    <button class="btn-pill btn-accent" style="width:150px;" onclick="saveName()">CONTINUE</button>
+</div>
+
+<div id="welcome-screen"><div class="welcome-anim" id="welcome-text">GK WELCOME TO NEZUKO<br>RAINBOW TOOLKIT</div></div>
+
+<div class="sidebar" id="sidebar">
+    <h3 style="color:var(--accent); text-align:center;">THEMES</h3>
+    <div class="theme-grid">
+        <div class="theme-dot" style="background:#ff85a2" onclick="setTheme('pink')"></div>
+        <div class="theme-dot" style="background:#2BD2FF" onclick="setTheme('blue')"></div>
+        <div class="theme-dot" style="background:#FFD700" onclick="setTheme('gold')"></div>
+        <div class="theme-dot" style="background:#bf55ff" onclick="setTheme('purple')"></div>
+        <div class="theme-dot" style="background:#ff4b2b" onclick="setTheme('red')"></div>
+        <div class="theme-dot" style="background:#00ff88" onclick="setTheme('green')"></div>
+    </div>
+    <button class="btn-pill btn-back" style="margin-top:20px;" onclick="resetIdentity()">Change Name 👤</button>
+    <button class="btn-pill btn-accent" onclick="window.open('https://wa.me/263781125706')">Contact Alpha 👑</button>
+    <button class="btn-pill btn-omega" onclick="window.open('https://wa.me/23278025474')">Contact Omega ⚡</button>
+    <button class="btn-pill btn-back" onclick="toggleMenu()">CLOSE</button>
+</div>
+
+<header>
+    <div style="font-family:'Cherry Bomb One'; color:var(--accent); font-size: 1.5rem;">NEZUKO V3</div>
+    <div onclick="toggleMusic()" style="cursor:pointer; font-size: 20px;" id="music-btn">🎵</div>
+    <div onclick="toggleMenu()" style="font-size:30px; color:var(--accent); cursor:pointer;">☰</div>
+</header>
+
+<main class="app-viewport">
+    <div id="pg-home" class="page active">
+        <div class="logo-container">
+            <img src="https://files.catbox.moe/svnb6u.jpeg" class="logo-img" alt="Logo">
         </div>
-
-        <h1 style="color: var(--pink); margin: 0;">NEZUKO ENHANCE</h1>
-        <p style="opacity: 0.7; font-size: 0.9rem;">Full Power Restoration</p>
-
-        <div class="mode-selector">
-            <button class="mode-btn active" onclick="setMode('enhance', this)">ENHANCE</button>
-            <button class="mode-btn" onclick="setMode('recolor', this)">RECOLOR</button>
-            <button class="mode-btn" onclick="setMode('dehaze', this)">DEHAZE</button>
-        </div>
-
-        <div class="preview-box" id="previewContainer">
-            <img id="imgPreview" src="">
-        </div>
-
-        <input type="file" id="fileInput" accept="image/*" hidden onchange="previewFile()">
-        <button onclick="document.getElementById('fileInput').click()" style="color:var(--pink); background:none; border:1px dashed var(--pink); padding:10px; width:100%; cursor:pointer; margin-bottom:15px; border-radius:10px;">
-            + SELECT PHOTO
-        </button>
-
-        <button id="enhanceBtn" onclick="startProcess()">UNLEASH POWER ✨</button>
-        
-        <div class="loader" id="loader"></div>
-
-        <div class="download-area" id="downloadArea">
-            <p style="color: var(--pink);">✨ Power Fully Restored! ✨</p>
-            <button class="dl-button" id="dlBtn">DOWNLOAD RESULT</button>
+        <div class="card" style="text-align:center;">
+            <h2 id="greeting-text" style="color:var(--accent); margin-top:0;">Hello!</h2>
+            <button class="btn-pill btn-sora" onclick="navTo('pg-sora')">SORA ENGINE 🎬</button>
+            <button class="btn-pill btn-flux" onclick="navTo('pg-img')">FLUX IMAGE 🎨</button>
+            <button class="btn-pill btn-veo" onclick="navTo('pg-veo')">VEO3 VIDEO 🐕</button>
+            <button class="btn-pill btn-chat" onclick="navTo('pg-chat')">CHAT AI 💬</button>
         </div>
     </div>
 
-    <audio id="sndClick" src="https://www.soundjay.com/buttons/sounds/button-3.mp3"></audio>
-    <audio id="sndDone" src="https://www.soundjay.com/buttons/sounds/button-10.mp3"></audio>
+    <div id="pg-sora" class="page">
+        <div class="card">
+            <h3>🎬 SORA VIDEO</h3>
+            <textarea id="in-sora" class="btn-pill" style="height:80px; text-align:left; background:rgba(0,0,0,0.3);" placeholder="Cinematic prompt..."></textarea>
+            <div id="ld-sora" style="display:none; text-align:center;">Generating...</div>
+            <video id="res-sora" class="media-res" controls></video>
+            <button id="gen-sora" class="btn-pill btn-sora" onclick="fire('sora')">START</button>
+            <div id="ctrl-sora" style="display:none; gap:10px;">
+                <button class="btn-pill btn-accent" style="flex:1" onclick="dlMedia('res-sora','sora.mp4')">SAVE</button>
+                <button class="btn-pill btn-back" style="flex:1" onclick="resetPage('sora')">RETRY</button>
+            </div>
+            <button class="btn-pill btn-back" onclick="navTo('pg-home')">BACK</button>
+        </div>
+    </div>
 
-    <script>
-        let currentMode = 'enhance';
-        
-        // Sakura Rain Effect
-        for(let i=0; i<20; i++) {
-            let s = document.createElement('div');
-            s.className = 'sakura';
-            s.innerHTML = '🌸';
-            s.style.left = Math.random() * 100 + 'vw';
-            s.style.animationDelay = Math.random() * 5 + 's';
-            document.getElementById('sakura-container').appendChild(s);
-        }
+    <div id="pg-img" class="page">
+        <div class="card">
+            <h3>🎨 IMAGE LAB</h3>
+            <input type="text" id="in-img" class="btn-pill" style="text-align:left; background:rgba(0,0,0,0.3);" placeholder="Prompt...">
+            <div id="ld-img" style="display:none; text-align:center;">Painting...</div>
+            <img id="res-img" class="media-res">
+            <button id="gen-img" class="btn-pill btn-flux" onclick="fire('img')">START</button>
+            <div id="ctrl-img" style="display:none; gap:10px;">
+                <button class="btn-pill btn-accent" style="flex:1" onclick="dlMedia('res-img','art.png')">SAVE</button>
+                <button class="btn-pill btn-back" style="flex:1" onclick="resetPage('img')">RETRY</button>
+            </div>
+            <button class="btn-pill btn-back" onclick="navTo('pg-home')">BACK</button>
+        </div>
+    </div>
 
-        function setMode(mode, btn) {
-            currentMode = mode;
-            document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-        }
+    <div id="pg-veo" class="page">
+        <div class="card">
+            <h3>🐕 VEO3 ANIMAL</h3>
+            <textarea id="in-veo" class="btn-pill" style="height:80px; text-align:left; background:rgba(0,0,0,0.3);" placeholder="Animal prompt..."></textarea>
+            <div id="ld-veo" style="display:none; text-align:center;">Tracking...</div>
+            <video id="res-veo" class="media-res" controls></video>
+            <button id="gen-veo" class="btn-pill btn-veo" onclick="fire('veo')">START</button>
+            <div id="ctrl-veo" style="display:none; gap:10px;">
+                <button class="btn-pill btn-accent" style="flex:1" onclick="dlMedia('res-veo','veo.mp4')">SAVE</button>
+                <button class="btn-pill btn-back" style="flex:1" onclick="resetPage('veo')">RETRY</button>
+            </div>
+            <button class="btn-pill btn-back" onclick="navTo('pg-home')">BACK</button>
+        </div>
+    </div>
 
-        function previewFile() {
-            const file = document.getElementById('fileInput').files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    document.getElementById('imgPreview').src = e.target.result;
-                    document.getElementById('previewContainer').style.display = 'block';
-                }
-                reader.readAsDataURL(file);
+    <div id="pg-chat" class="page">
+        <div class="card" style="height:400px; display:flex; flex-direction:column;">
+            <div id="chat-box" style="flex:1; overflow-y:auto; font-size: 13px;"></div>
+            <div style="display:flex; gap:5px;">
+                <input type="text" id="in-chat" class="btn-pill" style="flex:1; text-align:left; background:rgba(0,0,0,0.3);" placeholder="Chat...">
+                <button class="btn-pill btn-chat" style="width:60px;" onclick="fire('chat')">🚀</button>
+            </div>
+            <button class="btn-pill btn-back" onclick="navTo('pg-home')">BACK</button>
+        </div>
+    </div>
+</main>
+
+<footer>MISS ALPHA LOVES YOU ALL 2026 ©</footer>
+
+<nav class="tab-bar">
+    <div class="tab-item active" onclick="navTo('pg-home')">🏠<br>HUB</div>
+    <div class="tab-item" onclick="navTo('pg-sora')">🎬<br>SORA</div>
+    <div class="tab-item" onclick="navTo('pg-img')">🎨<br>FLUX</div>
+    <div class="tab-item" onclick="navTo('pg-chat')">💬<br>CHAT</div>
+</nav>
+
+<audio id="bg-music" loop src="https://files.catbox.moe/xe4yq3.mp3"></audio>
+
+<script>
+    window.onload = function() {
+        const storedName = localStorage.getItem('nezukoUserName');
+        if(storedName) { applyName(storedName); showWelcome(); }
+    };
+
+    function saveName() {
+        const name = document.getElementById('user-name-input').value.trim();
+        if(name === "") return alert("Please enter a name!");
+        localStorage.setItem('nezukoUserName', name);
+        applyName(name); showWelcome();
+    }
+
+    function applyName(name) {
+        document.getElementById('name-overlay').style.display = 'none';
+        document.getElementById('greeting-text').innerText = `Hello ${name}!`;
+        document.getElementById('welcome-text').innerHTML = `GK WELCOME ${name.toUpperCase()}<br>TO NEZUKO TOOLKIT`;
+    }
+
+    function showWelcome() {
+        const ws = document.getElementById('welcome-screen');
+        ws.style.display = 'flex';
+        setTimeout(() => ws.style.display = 'none', 3000);
+    }
+
+    function resetIdentity() { localStorage.removeItem('nezukoUserName'); location.reload(); }
+    function setTheme(color) { document.body.className = 'theme-' + color; }
+    function toggleMenu() { document.getElementById('sidebar').classList.toggle('active'); }
+    
+    const music = document.getElementById('bg-music');
+    function toggleMusic() {
+        if(music.paused) { music.play(); document.getElementById('music-btn').innerText = '🔊'; }
+        else { music.pause(); document.getElementById('music-btn').innerText = '🎵'; }
+    }
+
+    function navTo(id) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        document.querySelectorAll('.tab-item').forEach(t => {
+            t.classList.remove('active');
+            if(t.innerText.toLowerCase().includes(id.replace('pg-',''))) t.classList.add('active');
+            if(id === 'pg-home' && t.innerText.includes('HUB')) t.classList.add('active');
+        });
+    }
+
+    async function fire(type) {
+        const ld = document.getElementById(`ld-${type}`);
+        const res = document.getElementById(`res-${type}`);
+        const input = document.getElementById(`in-${type}`).value;
+        if(!input && type !== 'chat') return;
+        ld.style.display = 'block';
+
+        // Updated to use your local Backend Proxy
+        let api = `/api/proxy?type=${type}&prompt=${encodeURIComponent(input)}`;
+        if(type === 'chat') api = `/api/proxy?type=chat&text=${encodeURIComponent(input)}`;
+
+        try {
+            const resp = await fetch(api);
+            const data = await resp.json();
+            const mediaUrl = data.url || data.result || data.image || data.video;
+
+            if(type === 'chat') {
+                const box = document.getElementById('chat-box');
+                box.innerHTML += `<div><b>You:</b> ${input}</div><div style="color:var(--accent)"><b>Nezuko:</b> ${data.result}</div><br>`;
+                document.getElementById('in-chat').value = '';
+                box.scrollTop = box.scrollHeight;
+            } else if(mediaUrl) {
+                res.src = mediaUrl;
+                res.style.display = 'block';
+                document.getElementById(`gen-${type}`).style.display = 'none';
+                document.getElementById(`ctrl-${type}`).style.display = 'flex';
             }
-        }
+        } catch(e) { alert("Backend Error: Ensure server is running."); }
+        finally { ld.style.display = 'none'; }
+    }
 
-        async function startProcess() {
-            const file = document.getElementById('fileInput').files[0];
-            if(!file) return alert("Select a photo first!");
+    function resetPage(type) {
+        document.getElementById(`res-${type}`).style.display = 'none';
+        document.getElementById(`gen-${type}`).style.display = 'flex';
+        document.getElementById(`ctrl-${type}`).style.display = 'none';
+        document.getElementById(`in-${type}`).value = '';
+    }
 
-            document.getElementById('sndClick').play();
-            const btn = document.getElementById('enhanceBtn');
-            const loader = document.getElementById('loader');
-            const dlArea = document.getElementById('downloadArea');
-
-            btn.disabled = true;
-            loader.style.display = 'block';
-            dlArea.style.display = 'none';
-
-            // Loading phrases
-            let counter = 0;
-            const phrases = ["GATHERING ENERGY...", "BREATHING: FIRST FORM...", "BLOOD DEMON ART...", "FINALIZING..."];
-            const labelInterval = setInterval(() => {
-                btn.innerText = phrases[counter % phrases.length];
-                counter++;
-            }, 1200);
-
-            const fd = new FormData();
-            fd.append('image', file);
-            fd.append('mode', currentMode);
-
-            // Timer and API calls combined
-            const apiPromise = fetch('/process', { method: 'POST', body: fd });
-            const timerPromise = new Promise(resolve => setTimeout(resolve, 5000));
-
-            try {
-                const [res] = await Promise.all([apiPromise, timerPromise]);
-                
-                if (!res.ok) throw new Error();
-                const blob = await res.blob();
-                const url = URL.createObjectURL(blob);
-                
-                clearInterval(labelInterval);
-                document.getElementById('sndDone').play();
-                
-                document.getElementById('dlBtn').onclick = () => {
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = "nezuko_" + currentMode + ".jpg";
-                    a.click();
-                };
-                dlArea.style.display = 'block';
-                btn.innerText = "POWER RESTORED!";
-            } catch (e) {
-                clearInterval(labelInterval);
-                alert("Transformation failed! Check your connection.");
-                btn.disabled = false;
-                btn.innerText = "UNLEASH POWER ✨";
-            } finally {
-                loader.style.display = 'none';
-            }
-        }
-    </script>
+    async function dlMedia(elId, name) {
+        const src = document.getElementById(elId).src;
+        const resp = await fetch(src);
+        const blob = await resp.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = name;
+        document.body.appendChild(a); a.click();
+    }
+</script>
 </body>
 </html>
