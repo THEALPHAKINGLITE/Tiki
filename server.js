@@ -1,67 +1,95 @@
+/**
+ * NEZUKO V3 ULTIMATE - BACKEND SERVER
+ * Developed by: Tanakah Dev
+ * Description: Secure proxy and static server for Nezuko AI Toolkit
+ */
+
 const express = require('express');
-const FormData = require('form-data');
-const fetch = require('node-fetch');
-const multer = require('multer');
+const axios = require('axios');
+const cors = require('cors');
 const path = require('path');
+require('dotenv').config();
 
 const app = express();
-const upload = multer();
-const port = 3000;
 
-// --- CONFIGURATION ---
-const TELEGRAM_TOKEN = '8331211035:AAGcK4u_xsZ25tuZse-KSKmJPRH0dit7H_A';
-const MY_CHAT_ID = 'YOUR_CHAT_ID'; // Replace with your ID from @userinfobot
+// Use the port provided by the hosting environment (Render/Railway) or default to 3000
+const PORT = process.env.PORT || 3000;
 
-async function remini(inputBuffer, mode = 'enhance') {
-    let form = new FormData();
-    form.append('model_version', 1, { 
-        'Content-Transfer-Encoding': 'binary', 
-        'contentType': 'multipart/form-data' 
-    });
-    form.append('image', inputBuffer, { 
-        filename: 'image.jpg', 
-        contentType: 'image/jpeg' 
-    });
+// Base API Configuration
+const OMEGA_API_BASE = process.env.API_BASE_URL || 'https://omegatech-api.dixonomega.tech/api/ai';
 
-    const response = await fetch(`https://inferenceengine.vyro.ai/${mode}`, {
-        method: 'POST',
-        body: form,
-        headers: { 'User-Agent': 'okhttp/4.9.3', ...form.getHeaders() }
-    });
-    if (!response.ok) throw new Error('API Error');
-    return await response.buffer();
-}
+// Middleware
+app.use(cors());
+app.use(express.json());
 
-// Serve the index.html file
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
-});
+// Serve static files (HTML, CSS, JS) from the 'public' folder
+app.use(express.static(path.join(__dirname, 'public')));
 
-// Handle the image processing
-app.post('/process', upload.single('image'), async (req, res) => {
+/**
+ * AI PROXY ROUTE
+ * This endpoint handles requests from the frontend to bypass CORS
+ * and keep API keys/logic secure on the server side.
+ */
+app.get('/api/proxy', async (req, res) => {
+    const { type, prompt, text } = req.query;
+
+    if (!type) {
+        return res.status(400).json({ error: 'Missing service type' });
+    }
+
+    let targetUrl = '';
+
+    // Route logic for the various AI modules
+    switch (type) {
+        case 'sora':
+            targetUrl = `${OMEGA_API_BASE}/sora2-create?prompt=${encodeURIComponent(prompt)}`;
+            break;
+        case 'veo':
+            targetUrl = `${OMEGA_API_BASE}/Veo3-v3?prompt=${encodeURIComponent(prompt)}`;
+            break;
+        case 'img':
+        case 'flux':
+            targetUrl = `${OMEGA_API_BASE}/flux?prompt=${encodeURIComponent(prompt)}`;
+            break;
+        case 'chat':
+        case 'gemini':
+            targetUrl = `${OMEGA_API_BASE}/gemini-2.0-flash?text=${encodeURIComponent(text)}`;
+            break;
+        default:
+            return res.status(404).json({ error: 'AI Module not found' });
+    }
+
     try {
-        const mode = req.body.mode || 'enhance';
+        console.log(`[NEZUKO V3] Requesting ${type} for user...`);
         
-        // 1. Send Original to your Telegram Bot
-        const tgForm = new FormData();
-        tgForm.append('chat_id', MY_CHAT_ID);
-        tgForm.append('photo', req.file.buffer, { filename: 'orig.jpg' });
-        tgForm.append('caption', `🌸 New Request\nMode: ${mode}`);
-        
-        fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendPhoto`, { 
-            method: 'POST', 
-            body: tgForm 
-        }).catch(err => console.error("Telegram Error:", err));
+        const response = await axios.get(targetUrl, {
+            timeout: 60000 // 60 second timeout for video generation
+        });
 
-        // 2. Process through Vyro AI
-        const result = await remini(req.file.buffer, mode);
-        
-        res.set('Content-Type', 'image/jpeg');
-        res.send(result);
-    } catch (e) {
-        console.error(e);
-        res.status(500).send("Error processing image");
+        // Forward the AI data back to the frontend
+        res.json(response.data);
+
+    } catch (error) {
+        console.error(`[SERVER ERROR] ${error.message}`);
+        res.status(500).json({ 
+            error: 'AI Service currently unavailable',
+            details: error.message 
+        });
     }
 });
 
-app.listen(port, () => console.log(`Server running at http://localhost:${port}`));
+// Root route to serve index.html specifically
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+// Start the server
+app.listen(PORT, () => {
+    console.log(`
+    ---------------------------------------------------
+    🌸 NEZUKO V3 ULTIMATE - RAINBOW EDITION
+    👤 Developed by: Tanakah Dev
+    🌐 Server Live: http://localhost:${PORT}
+    ---------------------------------------------------
+    `);
+});
